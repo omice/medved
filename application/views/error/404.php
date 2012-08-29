@@ -1,0 +1,1 @@
+<img src="/static/img/e404_zombie.png" alt="">
