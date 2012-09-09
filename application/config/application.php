@@ -5,11 +5,11 @@ return array(
 					    'viewAutoload'  => true,
 						'view'          => array(
 												'doctype'       => 'html',
-												'title'         => 'kohana title',
+												'title'         => 'Медведь - аксессуары и оборудование для внедорожников',
 												'content'       => 'text/html',
 												'charset'       => 'UTF-8',
 												'meta'          => array(
-																		'title'                             => 'kohana meta title',
+																		'title'                             => 'Медведь - аксессуары и оборудование для внедорожников',
 																		'keywords'                          => 'kohana keywords',
 																		'description'                       => 'kohana description',
 												),

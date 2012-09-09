@@ -124,8 +124,8 @@ Route::set('default', '(<controller>(/<action>(/<id>)))')
 		'action'     => 'index',
 	));
 
-Route::set('catch_all', '<path>', array('path' => '.+'))
-	->defaults(array(
-	                'controller' => 'error',
-	                'action' => '404'
-	           ));
+//Route::set('catch_all', '<path>', array('path' => '.+'))
+//	->defaults(array(
+//	                'controller' => 'error',
+//	                'action' => '404'
+//	           ));

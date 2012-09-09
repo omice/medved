@@ -2,11 +2,6 @@
 
 class View_Front extends ProphetView {
 
-	protected function lists(){
 
-		$this->setHeader(array(
-			'title' => 'my tittle',
-		));
-	}
 
 }

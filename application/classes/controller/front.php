@@ -48,6 +48,13 @@ class Controller_Front extends Controller_Base_Front {
 		$this->View->render();
 	}
 
+	public function action_service(){
+
+		$this->request->controller('error');
+		$this->request->action('404');
+		//$this->View->render();
+	}
+
 
 
 
