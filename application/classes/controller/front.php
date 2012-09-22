@@ -61,15 +61,11 @@ class Controller_Front extends Controller_Base_Front {
 
 	public function action_lists()
 	{
-		echo 'index action---';
 //		var_dump(Prophet::instance());
 		$user   = new Model_User();
 //		$app    = new Model_Test();
-		var_dump($user);
 
-		$this->View->showChild('front/pages/main', array(
-			'text'	=> 'some text1',
-		));
+		$this->View->render();
 //		$this->mklsd();
 		//$auth = ProphetDB::instance();
 		//var_dump($auth);

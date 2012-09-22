@@ -109,4 +109,21 @@ return array
 		'caching'      => FALSE,
 		'profiling'    => TRUE,
 	),
+	'pgshop' => array
+	(
+		'type'       => 'postgresql',
+		'connection' => array(
+			'hostname'   => 'pg.sweb.ru',
+			'username'   => 'sochi4x4ru',
+			'password'   => '123321',
+			'persistent' => TRUE,
+			'database'   => 'sochi4x4ru',
+		),
+		'primary_key'  => '',   // Column to return from INSERT queries, see #2188 and #2273
+		'schema'       => 'shop',
+		'table_prefix' => '',
+		'charset'      => 'utf8',
+		'caching'      => FALSE,
+		'profiling'    => TRUE,
+	),
 );

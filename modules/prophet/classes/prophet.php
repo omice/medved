@@ -29,6 +29,7 @@ class Prophet {
 		}
 
 		$this->makeConnectionPool();
+
 	}
 
 	static public function instance(){
@@ -45,7 +46,9 @@ class Prophet {
 	{
 		if ($this->_mapingConfig){
 			foreach(array_keys($this->_mapingConfig) as $sConnectionName){
+
 				$this->_pool[$sConnectionName]  = Database::instance($sConnectionName);
+
 			}
 		}else{
 			$this->_pool['default'] = Database::instance($this->_config['connection_name']);
