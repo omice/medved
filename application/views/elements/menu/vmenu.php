@@ -1,4 +1,4 @@
-<h2>Каталог</h2>
+<h2 id="menuTitle">Каталог</h2>
 <div style="margin-left: 30px;">
 <!-- Меню "Каталог -->
 	<ul>

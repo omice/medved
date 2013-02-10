@@ -109,16 +109,21 @@ Kohana::modules(array(
 	 'database'     => MODPATH.'database',      // Database access
 //	 'image'        => MODPATH.'image',         // Image manipulation
 	 'orm'          => MODPATH.'orm',           // Object Relationship Mapping
-//	 'unittest'     => MODPATH.'unittest',      // Unit testing
+	 'unittest'     => MODPATH.'unittest',      // Unit testing
 	 'userguide'    => MODPATH.'userguide',     // User guide and API documentation
 	 'prophet'      => MODPATH.'prophet',       // Prophet tools
-	 'menu'         => MODPATH.'menu',          // Shop Catalog
 	));
 
 /**
  * Set the routes. Each route must have a minimum of a name, a URI and a set of
  * defaults for the URI.
  */
+Route::set('about', 'about')
+	->defaults(array(
+	                'controller' => 'front',
+	                'action'     => 'about',
+	           ));
+
 Route::set('default', '(<controller>(/<action>(/<id>)))')
 	->defaults(array(
 		'controller' => 'front',

@@ -22,7 +22,7 @@
 
 		<table id="main_table">
 
-			<tr>
+			<tr id="top">
 				<td id="top_left">
 					<a href="/"><div id="logo"></div></a>
 				</td>
@@ -50,7 +50,7 @@
 					<?= View::factory('elements/banner/partners');?>
 
 				</td>
-				<td>
+				<td id="mainContent">
 
 					<?=$childView?>
 

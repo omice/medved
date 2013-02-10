@@ -25,7 +25,6 @@
  * правая колонка в блоке контента
  * левый блок рекламы
  * статьи
- * header (meta tags and other)
  */
 
 
@@ -34,6 +33,7 @@ class Controller_Front extends Controller_Base_Front {
 	public function action_index()
 	{
 		$this->View->render();
+
 	}
 
 
@@ -45,7 +45,10 @@ class Controller_Front extends Controller_Base_Front {
 
 	public function action_about(){
 
-		$this->View->render();
+		echo json_encode(array(
+			'html'	=> $this->View->get('front/about')
+		));
+//		$this->View->render();
 	}
 
 	public function action_service(){
@@ -56,29 +59,97 @@ class Controller_Front extends Controller_Base_Front {
 	}
 
 
-
-
-
 	public function action_lists()
 	{
-//		var_dump(Prophet::instance());
-		$user   = new Model_User();
-//		$app    = new Model_Test();
+		$Category   = new Model_Category();
+		$Category->getTree();
+//		$parents = $Category->getChilds();
+//		var_dump($parents->count());
+//
+//		foreach( $parents as $parent){
+//			var_dump($parent->category_name);
+//		}
+//
+//
+//		$this->View->render();
+	}
 
-		$this->View->render();
-//		$this->mklsd();
-		//$auth = ProphetDB::instance();
-		//var_dump($auth);
-//		$this->View->render(array(
-//			'text'	=> 'front/lists',
-//		));
 
-//		debug_print_backtrace();
-		//$this->ghj();
+	public function action_menu(){
+
+		$this->View->showChild('elements/menu/vmenu');
 	}
 
 
 
+	public function action_getPageList(){
+
+		$pageList = array(
+			array(
+				'name'	=> 'about',
+				'url'	=> '/about',
+				'title'	=> 'О компании',
+				'html'	=> ''
+			),
+			array(
+				'name'	=> 'service',
+				'url'	=> '/service',
+				'title'	=> 'Сервис',
+				'html'	=> ''
+			),
+			array(
+				'name'	=> 'contact',
+				'url'	=> '/contact',
+				'title'	=> 'Контактная информация',
+				'html'	=> ''
+			),
+		);
+
+//		$jsonPages	= array();
+//		foreach($pageList as $Page){
+//			$jsonPages	= json_encode($)
+//
+//		}
+
+		echo json_encode($pageList);
+
+	}
+
+	public function action_getContentModel(){
+
+		$pageList = array(
+			array(
+				'index'	=> 'about',
+				'name'	=> 'about',
+				'url'	=> '/about',
+				'title'	=> 'О компании',
+				'html'	=> ''
+			),
+			array(
+				'index'	=> 'service',
+				'name'	=> 'service',
+				'url'	=> '/service',
+				'title'	=> 'Сервис',
+				'html'	=> ''
+			),
+			array(
+				'index'	=> 'contact',
+				'name'	=> 'contact',
+				'url'	=> '/contact',
+				'title'	=> 'Контактная информация',
+				'html'	=> ''
+			),
+		);
+
+//		$jsonPages	= array();
+//		foreach($pageList as $Page){
+//			$jsonPages	= json_encode($)
+//
+//		}
+
+		echo json_encode($pageList);
+
+	}
 
 }
 
