@@ -22,4 +22,33 @@ abstract class ProphetORM extends ORM {
 		parent::__construct();
 	}
 
+
+	public function as_list_of_arrays(Database_Result $sqlResult, $inidexBy = null){
+
+		return $this->feachSqlResult($sqlResult, 'array', $inidexBy);
+	}
+
+	public function as_list_of_objects(Database_Result $sqlResult, $inidexBy = null){
+
+		return $this->feachSqlResult($sqlResult, 'object', $inidexBy);
+	}
+
+	private function feachSqlResult(Database_Result $sqlResult, $feachBy = 'array', $inidexBy = null){
+
+		$objects = array();
+
+		foreach($sqlResult as $result){
+
+			$object = $result->as_array();
+			if ($inidexBy){
+				$objects[$object[$inidexBy]]	= ($feachBy == 'array' ? $object : (object) $object);
+			}else{
+				$objects[]	= ($feachBy == 'array' ? $object : (object) $object);
+			}
+		}
+
+		return $objects;
+	}
+
+
 }

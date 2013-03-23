@@ -57,7 +57,7 @@ class Bench_Transliterate extends Codebench {
 
 	public function bench_iconv($subject)
 	{
-		// Note: need to suppress error on iconv because some chars trigger the following notice:
+		// Note: need to suppress errors on iconv because some chars trigger the following notice:
 		// "Detected an illegal character in input string"
 		return preg_replace('~[^-a-z0-9]+~i', '', @iconv('UTF-8', 'ASCII//TRANSLIT', $subject));
 	}

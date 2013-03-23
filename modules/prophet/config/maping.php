@@ -8,15 +8,20 @@ return array(
 		'users'
 	),
 	'pgapp'      => array(
-		'countries',
 		'resources',
 		'files',
 		'test',
 		'test2',
 	),
 	'pgshop'    => array(
-		'products',
+
 		'categories',
+		'countries',
+		'imports',
+		'pricelist',
+		'products',
+		'synonyms',
+		'tags',
 		'vendors',
 	),
 );

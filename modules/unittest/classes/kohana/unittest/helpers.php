@@ -21,7 +21,7 @@ class Kohana_Unittest_Helpers {
 	{
 		if ( ! isset(self::$_has_internet))
 		{
-			// The @ operator is used here to avoid DNS error when there is no connection.
+			// The @ operator is used here to avoid DNS errors when there is no connection.
 			$sock = @fsockopen("www.google.com", 80, $errno, $errstr, 1);
 
 			self::$_has_internet = (bool) $sock ? TRUE : FALSE;

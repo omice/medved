@@ -1,10 +1,10 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php defined('SYSPATH') OR die('No direct script access.');
 /**
  * ORM Validation exceptions.
  *
  * @package    Kohana/ORM
  * @author     Kohana Team
- * @copyright  (c) 2007-2010 Kohana Team
+ * @copyright  (c) 2007-2012 Kohana Team
  * @license    http://kohanaframework.org/license
  */
 class Kohana_ORM_Validation_Exception extends Kohana_Exception {
@@ -31,13 +31,13 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 	 * @param  integer    $code        The error code for the exception
 	 * @return void
 	 */
-	public function __construct($alias, Validation $object, $message = 'Failed to validate array', array $values = NULL, $code = 0)
+	public function __construct($alias, Validation $object, $message = 'Failed to validate array', array $values = NULL, $code = 0, Exception $previous = NULL)
 	{
 		$this->_alias = $alias;
 		$this->_objects['_object'] = $object;
 		$this->_objects['_has_many'] = FALSE;
 
-		parent::__construct($message, $values, $code);
+		parent::__construct($message, $values, $code, $previous);
 	}
 
 	/**
@@ -46,7 +46,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 	 *     // The following will add a validation object for a profile model
 	 *     // inside the exception for a user model.
 	 *     $e->add_object('profile', $validation);
-	 *     // The error array will now look something like this
+	 *     // The errors array will now look something like this
 	 *     // array
 	 *     // (
 	 *     //   'username' => 'This field is required',
@@ -63,7 +63,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 	 */
 	public function add_object($alias, Validation $object, $has_many = FALSE)
 	{
-		// We will need this when generating error
+		// We will need this when generating errors
 		$this->_objects[$alias]['_has_many'] = ($has_many !== FALSE);
 
 		if ($has_many === TRUE)
@@ -86,7 +86,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 
 	/**
 	 * Merges an ORM_Validation_Exception object into the current exception
-	 * Useful when you want to combine error into one array
+	 * Useful when you want to combine errors into one array
 	 *
 	 * @param  ORM_Validation_Exception $object   The exception to merge
 	 * @param  mixed                    $has_many The array key to use if this exception can be merged multiple times
@@ -96,7 +96,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 	{
 		$alias = $object->alias();
 
-		// We will need this when generating error
+		// We will need this when generating errors
 		$this->_objects[$alias]['_has_many'] = ($has_many !== FALSE);
 
 		if ($has_many === TRUE)
@@ -118,10 +118,10 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 	}
 
 	/**
-	 * Returns a merged array of the error from all the Validation objects in this exception
+	 * Returns a merged array of the errors from all the Validation objects in this exception
 	 *
-	 *     // Will load Model_User error from messages/orm-validation/user.php
-	 *     $e->error('orm-validation');
+	 *     // Will load Model_User errors from messages/orm-validation/user.php
+	 *     $e->errors('orm-validation');
 	 *
 	 * @param   string  $directory Directory to load error messages from
 	 * @param   mixed   $translate Translate the message
@@ -134,10 +134,10 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 	}
 
 	/**
-	 * Recursive method to fetch all the error in this exception
+	 * Recursive method to fetch all the errors in this exception
 	 *
 	 * @param  string $alias     Alias to use for messages file
-	 * @param  array  $array     Array of Validation objects to get error from
+	 * @param  array  $array     Array of Validation objects to get errors from
 	 * @param  string $directory Directory to load error messages from
 	 * @param  mixed  $translate Translate the message
 	 * @return array
@@ -150,13 +150,17 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 		{
 			if (is_array($object))
 			{
-				$errors[$key] = $this->generate_errors($key, $object, $directory, $translate);
+				$errors[$key] = ($key === '_external')
+					// Search for errors in $alias/_external.php
+					? $this->generate_errors($alias.'/'.$key, $object, $directory, $translate)
+					// Regular models get their own file not nested within $alias
+					: $this->generate_errors($key, $object, $directory, $translate);
 			}
 			elseif ($object instanceof Validation)
 			{
 				if ($directory === NULL)
 				{
-					// Return the raw error
+					// Return the raw errors
 					$file = NULL;
 				}
 				else
@@ -164,7 +168,7 @@ class Kohana_ORM_Validation_Exception extends Kohana_Exception {
 					$file = trim($directory.'/'.$alias, '/');
 				}
 
-				// Merge in this array of error
+				// Merge in this array of errors
 				$errors += $object->errors($file, $translate);
 			}
 		}
