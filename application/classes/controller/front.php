@@ -46,7 +46,7 @@ class Controller_Front extends Controller_Base_Front {
 	public function action_about(){
 
 		echo json_encode(array(
-			'html'	=> $this->View->get('front/about')
+			'html'	=> $this->View->get('Front/about')
 		));
 //		$this->View->render();
 	}

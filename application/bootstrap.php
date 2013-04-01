@@ -22,7 +22,7 @@ else
  * @link http://kohanaframework.org/guide/using.configuration
  * @link http://www.php.net/manual/timezones
  */
-date_default_timezone_set('America/Chicago');
+date_default_timezone_set('Europe/Moscow');
 
 /**
  * Set the default locale.
@@ -30,7 +30,7 @@ date_default_timezone_set('America/Chicago');
  * @link http://kohanaframework.org/guide/using.configuration
  * @link http://www.php.net/manual/function.setlocale
  */
-setlocale(LC_ALL, 'en_US.utf-8');
+setlocale(LC_ALL, 'ru_RU.utf-8');
 
 /**
  * Enable the Kohana auto-loader.
@@ -61,7 +61,7 @@ ini_set('unserialize_callback_func', 'spl_autoload_call');
 /**
  * Set the default language
  */
-I18n::lang('en-us');
+I18n::lang('ru-ru');
 
 /**
  * Set Kohana::$environment if a 'KOHANA_ENV' environment variable has been supplied.
@@ -69,10 +69,11 @@ I18n::lang('en-us');
  * Note: If you supply an invalid environment name, a PHP warning will be thrown
  * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
  */
-if (isset($_SERVER['KOHANA_ENV']))
-{
-	Kohana::$environment = constant('Kohana::'.strtoupper($_SERVER['KOHANA_ENV']));
-}
+//if (isset($_SERVER['KOHANA_ENV']))
+//{
+//	Kohana::$environment = constant('Kohana::'.strtoupper($_SERVER['KOHANA_ENV']));
+//}
+Kohana::$environment = ($_SERVER['SERVER_NAME'] !== 'kh.sochi4x4.ru') ? Kohana::PRODUCTION : Kohana::DEVELOPMENT;
 
 /**
  * Initialize Kohana, setting the default options.
@@ -90,9 +91,12 @@ if (isset($_SERVER['KOHANA_ENV']))
  * - boolean  expose      set the X-Powered-By header                        FALSE
  */
 Kohana::init(array(
-	'base_url'   => '/kohana/',
-));
-
+                  'base_url'	=> '/',
+                  'index_file'	=> '',
+                  'charset'     => 'utf-8',
+                  'profile'     => Kohana::$environment === Kohana::DEVELOPMENT, // Профилирование только для стадии разработки
+                  'caching'     => Kohana::$environment === Kohana::PRODUCTION, // Кеширование только для production
+             ));
 /**
  * Attach the file write to logging. Multiple writers are supported.
  */
@@ -107,15 +111,16 @@ Kohana::$config->attach(new Config_File);
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
 Kohana::modules(array(
-	// 'auth'       => MODPATH.'auth',       // Basic authentication
-	// 'cache'      => MODPATH.'cache',      // Caching with multiple backends
-	// 'codebench'  => MODPATH.'codebench',  // Benchmarking tool
-	// 'database'   => MODPATH.'database',   // Database access
-	// 'image'      => MODPATH.'image',      // Image manipulation
-	// 'minion'     => MODPATH.'minion',     // CLI Tasks
-	// 'orm'        => MODPATH.'orm',        // Object Relationship Mapping
-	// 'unittest'   => MODPATH.'unittest',   // Unit testing
-	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
+//	 'auth'       => MODPATH.'auth',       // Basic authentication
+//	 'cache'      => MODPATH.'cache',      // Caching with multiple backends
+//	 'codebench'  => MODPATH.'codebench',  // Benchmarking tool
+	 'database'   => MODPATH.'database',   // Database access
+//	 'image'      => MODPATH.'image',      // Image manipulation
+//	 'minion'     => MODPATH.'minion',     // CLI Tasks
+	 'orm'        => MODPATH.'orm',        // Object Relationship Mapping
+//	 'unittest'   => MODPATH.'unittest',   // Unit testing
+//	 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
+     'prophet'      => MODPATH.'prophet',
 	));
 
 /**
@@ -124,6 +129,6 @@ Kohana::modules(array(
  */
 Route::set('default', '(<controller>(/<action>(/<id>)))')
 	->defaults(array(
-		'controller' => 'welcome',
+		'controller' => 'Front',
 		'action'     => 'index',
 	));

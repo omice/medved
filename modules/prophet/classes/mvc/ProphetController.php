@@ -29,15 +29,14 @@ class ProphetController extends Controller {
 	
 	protected function loadView($Config = null){
 		
-		$controllerName	= strtolower($this->request->controller());
+		$controllerName	= $this->request->controller();
 		$viewObj 		= 'View_'.ucfirst($controllerName);
 
 		if (!$Config){
 			$Config = $this->Config;
 		}
 
-		if (Kohana::find_file('classes/view', $controllerName)){
-
+		if (Kohana::find_file('classes/View', $controllerName)){
 			if (class_exists($viewObj)){
 
 				$this->View = new $viewObj($this->request, $this->response, $Config);

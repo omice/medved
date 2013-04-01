@@ -13,7 +13,7 @@ class Controller_Index extends Controller {
 		//$auth = ProphetDB::instance();
 		//var_dump($auth);
 //		$this->View->render(array(
-//			'text'	=> 'front/lists',
+//			'text'	=> 'Front/lists',
 //		));
 
 //		debug_print_backtrace();

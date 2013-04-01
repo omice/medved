@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class ProphetView {
+class ProphetView{
 
 	protected   $View;
 	protected   $ViewData;
@@ -82,9 +82,8 @@ class ProphetView {
 			$sLayout    = $this->layout;
 		}
 
-		$view = View::factory('layouts' . DIRECTORY_SEPARATOR . $sLayout);
+		$view = View::factory('_layouts' . DIRECTORY_SEPARATOR . $sLayout);
 		$view->View = $this->View;
-
 
 		$view->childView    = View::factory($sViewFile, $aData);
 
