@@ -1,32 +1,4 @@
 <?php defined('SYSPATH') or die('No direct script access.');
-/**
- * БЛОКИ
- *
- * блок поиска
- * блок подкаталога на странице контента
- * блок списка товара в категории
- * блок меню
- * корзина
- * правая колонка в блоке контента
- * левый блок рекламы
- * страница результатов поиска
- * 2 блока "другие статьи"
- * блок статьи на главной
- */
-
-/**
- * АСПЕКТЫ
- *
- * поиск
- * товары
- * главное меню
- * правое меню
- * корзина
- * правая колонка в блоке контента
- * левый блок рекламы
- * статьи
- */
-
 
 class Controller_Front extends Controller_Base_Front {
 
@@ -45,32 +17,20 @@ class Controller_Front extends Controller_Base_Front {
 
 	public function action_about(){
 
-		echo json_encode(array(
-			'html'	=> $this->View->get('Front/about')
-		));
-//		$this->View->render();
+		$this->View->render();
 	}
 
 	public function action_service(){
 
-		$this->request->controller('error');
-		$this->request->action('404');
-		//$this->View->render();
+		$this->View->render();
 	}
 
 
 	public function action_lists()
 	{
 		$Category   = new Model_Category();
-		$Category->getTree();
-//		$parents = $Category->getChilds();
-//		var_dump($parents->count());
-//
-//		foreach( $parents as $parent){
-//			var_dump($parent->category_name);
-//		}
-//
-//
+		$list = $Category->where('category_id', '>', '1')->find_all()->as_collection_of_objects('category_id');
+
 //		$this->View->render();
 	}
 

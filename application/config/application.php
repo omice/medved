@@ -21,7 +21,7 @@ return array(
 //																		'/static/js/backbone-min.js'        => 'text/javascript',
 //																		'/static/js/storage.js'             => 'text/javascript',
 //																		'/static/js/backbone-localstorage.js'=> 'text/javascript',
-//																		'/static/js/user.js'                => 'text/javascript',
+																		'/static/js/user.js'                => 'text/javascript',
 //																		'/static/js/require.js'				=> 'text/javascript',
 //																		'/static/js/app.js'					=> 'text/javascript',
 												),

@@ -335,4 +335,39 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 		return $this->offsetExists($this->_current_row);
 	}
 
+
+	# added from 'prophet'
+	/**
+	 * @param Database_Result $sqlResult
+	 * @param null $inidexBy
+	 * @return array
+	 */
+	public function as_collection_of_arrays($inidexBy = NULL){
+
+		return $this->feachSqlResult($this, 'array', $inidexBy);
+	}
+
+	public function as_collection_of_objects($inidexBy = NULL){
+
+		return $this->feachSqlResult($this, 'object', $inidexBy);
+	}
+
+	protected function feachSqlResult(Database_Result $sqlResult, $feachBy = 'array', $inidexBy = NULL){
+
+		$objects = array();
+
+		foreach($sqlResult as $result){
+
+			$object = $result->as_array();
+			if ($inidexBy){
+				$objects[$object[$inidexBy]]	= ($feachBy == 'array' ? $object : (object) $object);
+			}else{
+				$objects[]	= ($feachBy == 'array' ? $object : (object) $object);
+			}
+		}
+
+		return $objects;
+	}
+	# /added from 'prophet'
+
 } // End Database_Result
