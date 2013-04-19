@@ -11,13 +11,15 @@ abstract class ProphetORM extends ORM {
 	protected $_table_name;
 	protected $_db;
 
+
 	public function __construct(){
 
 		if (!$this->_table_name){
 			throw new Database_Exception('Table names not set in model');
 		}
 
-		$this->_db   = Prophet::instance()->getFromPool($this->_table_name);
+		$this->_db   		= Prophet::instance()->getFromPool($this->_table_name);
+		$this->_db_group	= Prophet::instance()->getConfigByTableName($this->_table_name);
 
 		parent::__construct();
 	}

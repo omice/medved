@@ -358,7 +358,19 @@ abstract class Kohana_Database_Result implements Countable, Iterator, SeekableIt
 
 		foreach($sqlResult as $result){
 
-			$object = $result->as_array();
+			if ($result instanceof Model){
+
+				$object = $result->as_array();
+
+			}elseif(is_array($result)){
+
+				$object = &$result;
+
+			}else{
+
+				throw new Kohana_Database_Exception('Unknown object interface');
+			}
+
 			if ($inidexBy){
 				$objects[$object[$inidexBy]]	= ($feachBy == 'array' ? $object : (object) $object);
 			}else{

@@ -5,7 +5,6 @@ class Controller_Front extends Controller_Base_Front {
 	public function action_index()
 	{
 		$this->View->render();
-
 	}
 
 
@@ -29,11 +28,20 @@ class Controller_Front extends Controller_Base_Front {
 	public function action_lists()
 	{
 		$Category   = new Model_Category();
-		$list = $Category->where('category_id', '>', '1')->find_all()->as_collection_of_objects('category_id');
+//		$listRoots	= $Category->getRoots();
+//		$listLeafs	= $Category->getLeafs();
+//		$listBranches	= $Category->getBranches();
+
+//		var_dump($listLeafs->as_collection_of_objects());
+//		var_dump($listBranches->as_collection_of_objects());
+//		var_dump($listRoots->as_collection_of_objects());
+
+		var_dump($Category->makeTree());
+//		$SimpleTreeView	= Phelper::Factory('SimpleTree');
+//		$SimpleTreeView->makeTree();
 
 //		$this->View->render();
 	}
-
 
 	public function action_menu(){
 

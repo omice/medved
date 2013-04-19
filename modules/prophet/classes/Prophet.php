@@ -74,4 +74,16 @@ class Prophet {
 			return $this->_pool['default'];
 		}
 	}
+
+
+	public function getConfigByTableName($sTableName = null){
+
+		if ($sTableName && $this->_config['table_mapping']){
+
+			if (isset($this->_aConnectionMap[$sTableName])){
+				return $this->_aConnectionMap[$sTableName];
+			}
+		}
+		return NULL;
+	}
 }

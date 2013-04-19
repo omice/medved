@@ -94,8 +94,8 @@ Kohana::init(array(
                   'base_url'	=> '/',
                   'index_file'	=> '',
                   'charset'     => 'utf-8',
-                  'profile'     => Kohana::$environment === Kohana::DEVELOPMENT, // Профилирование только для стадии разработки
-                  'caching'     => Kohana::$environment === Kohana::PRODUCTION, // Кеширование только для production
+                  'profile'     => Kohana::$environment === Kohana::DEVELOPMENT,
+                  'caching'     => Kohana::$environment === Kohana::PRODUCTION,
              ));
 /**
  * Attach the file write to logging. Multiple writers are supported.
@@ -121,6 +121,7 @@ Kohana::modules(array(
 //	 'unittest'   => MODPATH.'unittest',   // Unit testing
 //	 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
      'prophet'      => MODPATH.'prophet',
+     'phelper'      => MODPATH.'phelper',
 	));
 
 /**
