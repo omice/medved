@@ -7,9 +7,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
-abstract class Model_Abstract_SimpleTree extends ProphetORM_Model {
+abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess, Iterator {
 
-	protected $_parent_key;
+	protected	$_parent_key;
+	private		$_container	= array();
 
 	public function __construct(){
 
@@ -20,6 +21,12 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model {
 			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
 			throw new Model_Abstract_Exeption_SimpleTree('"_parent_key" must be specified');
 		}
+	}
+
+
+	public function getParentAttrName(){
+
+		return $this->_parent_key;
 	}
 
 	public function getRoots(){
@@ -46,5 +53,123 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model {
 			->on('t2.'.($this->_primary_key), '=', 't1.'.($this->_parent_key) )
 			->where('t2.'.($this->_parent_key), 'IS NOT', NULL)
 			->execute($this->_db_group);
+	}
+
+
+	public function makeTree(&$node = NULL){
+
+		static $flatTree;
+
+		$PKName		= $this->_primary_key;
+		$PrKName	= $this->_parent_key;
+
+		if (!$flatTree){
+
+			$flatTree	= $this->find_all()->as_collection_of_objects($this->_primary_key);
+		}
+
+		if ($node){
+
+			if (!isset($node->level)){
+
+				$node->level	= 1;
+			}
+
+			foreach($flatTree as $childId => $child){
+
+				if ($child->$PrKName == $node->$PKName){
+
+					if (!isset($child->level)){
+
+						$child->level	= $node->level + 1;
+
+					}elseif (!isset($node->level)){
+
+						$node->level	= $child->level - 1;
+					}
+
+					$node->nodes[$childId]	= $child;
+				}
+			}
+
+			if (!is_null($node->$PrKName)){
+
+				$flatTree[$node->$PrKName]->level	= $node->level -1;
+			}
+
+		}else{
+
+			foreach($flatTree as &$node){
+
+				$this->makeTree($node);
+			}
+
+			// remove non-root elements from root
+			foreach($flatTree as &$node){
+
+				if ($node->$PrKName){
+
+					unset($flatTree[$node->$PKName]);
+				}
+			}
+		}
+
+		$this->_container	= $flatTree;
+		return $this;
+	}
+
+
+	/**
+	 * ArrayAccess impliment
+	 */
+	public function offsetSet($offset, $value) {
+
+		if (is_null($offset)) {
+
+			$this->_container[] = $value;
+		} else {
+			$this->_container[$offset] = $value;
+		}
+	}
+	public function offsetExists($offset) {
+
+		return isset($this->_container[$offset]);
+	}
+	public function offsetUnset($offset) {
+
+		unset($this->_container[$offset]);
+	}
+	public function offsetGet($offset) {
+
+		return isset($this->_container[$offset]) ? $this->_container[$offset] : null;
+	}
+
+
+	/**
+	 * Iterator impliment
+	 */
+	function rewind() {
+
+		reset($this->_container);
+	}
+
+	function current() {
+
+		return current($this->_container);
+	}
+
+	function key() {
+
+		return key($this->_container);
+	}
+
+	function next() {
+
+		next($this->_container);
+	}
+
+	function valid() {
+
+		return (bool) current($this->_container);
 	}
 }

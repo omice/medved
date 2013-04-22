@@ -36,9 +36,17 @@ class Controller_Front extends Controller_Base_Front {
 //		var_dump($listBranches->as_collection_of_objects());
 //		var_dump($listRoots->as_collection_of_objects());
 
-		var_dump($Category->makeTree());
-//		$SimpleTreeView	= Phelper::Factory('SimpleTree');
-//		$SimpleTreeView->makeTree();
+//		var_dump($Category->makeTree());
+
+		$SimpleTreeView	= Phelper::Factory('SimpleTree');
+		$tree = $SimpleTreeView->makeTree($Category->makeTree(), array(
+			array('[', "]\n"),
+			array('--[', "]\n"),
+			array('----[', "]\n"),
+			array('------[', "]\n"),
+		));
+
+		var_dump($tree);
 
 //		$this->View->render();
 	}

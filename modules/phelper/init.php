@@ -33,6 +33,7 @@ class Phelper{
 		}
 
 		$HelperName	= 'phelper\\'.$HelperName;
+
 		return new $HelperName($args);
 	}
 
