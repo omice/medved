@@ -31,7 +31,9 @@ class SchemaTree implements ArrayAccess{
 
 	}
 
-	public function pushTmpl($tmp){
+	public function pushTmpl($tmpStart, $tmpEnd){
+
+		$this->_container[]['tmpl']['start'];
 
 	}
 
@@ -43,6 +45,7 @@ class SchemaTree implements ArrayAccess{
 
 	public function getTmplFileName($index, $part){
 
+		return $this->_container[$index]['tmpl'][$part];
 	}
 
 

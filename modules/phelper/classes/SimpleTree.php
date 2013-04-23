@@ -64,6 +64,12 @@ class SimpleTree {
 	}
 
 
+	private function renderNodeEnd($node){
+
+		return $this->renderNode($node, 'end');
+	}
+
+
 
 	private function renderNode($node, $part){
 
