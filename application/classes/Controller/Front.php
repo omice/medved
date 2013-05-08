@@ -38,13 +38,13 @@ class Controller_Front extends Controller_Base_Front {
 
 //		var_dump($Category->makeTree());
 
-		$SimpleTreeView	= Phelper::Factory('SimpleTree');
-		$tree = $SimpleTreeView->makeTree($Category->makeTree(), array(
-			array('[', "]\n"),
-			array('--[', "]\n"),
-			array('----[', "]\n"),
-			array('------[', "]\n"),
-		));
+
+
+		$mainMenuRenderSchema	= Phelper::Factory('SchemaTree', APPPATH . 'views/elements/menu/treeSchema.php' );
+
+		$SimpleTreeView	= Phelper::Factory('SimpleTree', $Category->makeTree(), $mainMenuRenderSchema);
+
+		$tree = $SimpleTreeView->renderToString();
 
 		var_dump($tree);
 

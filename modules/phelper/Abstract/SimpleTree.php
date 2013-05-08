@@ -4,6 +4,7 @@
  * User: user
  * Date: 18.04.13
  * Time: 16:07
+ * To change this template use File | Settings | File Templates.
  */
 
 abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess, Iterator {
@@ -28,11 +29,6 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
 			throw new Model_Abstract_Exeption_SimpleTree('"_exportMap" must be specified');
 		}
-	}
-
-	public function getExportMap(){
-
-		return $this->_export_map;
 	}
 
 

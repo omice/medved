@@ -14,6 +14,12 @@ class Model_Category extends Model_Abstract_SimpleTree {
 	protected $_table_name  = 'categories';
 	protected $_primary_key = 'category_id';
 	protected $_parent_key	= 'category_parent';
+	protected $_export_map	= array(
+		'category_id',
+		'category_parent',
+		'category_name',
+		'category_desc',
+	);
 
 	public function getList(){
 

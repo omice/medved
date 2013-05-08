@@ -12,21 +12,29 @@ namespace phelper;
 class SimpleTree {
 
 	private $_schema;
+	private $_tree;
 	private $_rootIndex;
 
-	public function __construct($args){
+	public function __construct(\Model_Abstract_SimpleTree $treeObject, SchemaTree $treeSchema){
+
+		$this->_tree	= $treeObject;
+		$this->_schema	= $treeSchema;
 
 	}
 
-	public function setSchema($schema){
+	public function renderToString(){
 
-		$this->_schema	= $schema;
+		return $this->makeTree($this->_tree);
+	}
+
+	public function renderToOut(){
+
+		echo $this->makeTree($this->_tree);
 	}
 
 
-	public function makeTree($treeObject){
+	private function makeTree($treeObject){
 
-		static $rootIndex;
 		static $treeStr;
 		static $parentIdAttrName;
 
@@ -53,11 +61,6 @@ class SimpleTree {
 		return $treeStr;
 	}
 
-	/*
-	<div id="<?= $nodeId ?>"><?= $nodeContent ?>
-		<span><?= $nodeDesc	?></span>
-	</div>
-	*/
 	private function renderNodeBegin($node){
 
 		return $this->renderNode($node, 'start');
@@ -73,19 +76,25 @@ class SimpleTree {
 
 	private function renderNode($node, $part){
 
-		$nodeIndex	= $this->_rootIndex - $node->level;
+		$nodeIndex	= $node->level - $this->_rootIndex;
 
-		$tmplFileName	= $this->_schema->getTmplFileName($nodeIndex, $part);
+		$template	= $this->_schema->getByIndex($nodeIndex, $part);
 
-		foreach($this->_schema->getImportRule($nodeIndex, $part) as $newVar => $newVal){
 
-			$$newVar	= $newVal;
+		foreach($this->_tree->getExportMap() as $newVar => $newVal){
+
+			if (is_int($newVar)){// если список не ассоциативные то экспортируем переменные под текущими именами
+				$newVar = $newVal;
+			}
+
+			$$newVar	= $node->$newVal;
 		}
 
 		ob_start();
-			include($tmplFileName);
+			eval('?>' . $template);
 			$output = ob_get_contents();
 		ob_end_clean();
+
 		return $output;
 	}
 }

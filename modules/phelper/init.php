@@ -9,6 +9,8 @@
 
 class Phelper{
 
+	const NSPACE	= 'phelper\\';
+
 	protected static $_configs_dir;
 	protected static $_helpers_dir;
 
@@ -23,18 +25,24 @@ class Phelper{
 	}
 
 
-	public static function Factory($HelperName, $args = NULL){
+	public static function Factory($HelperName){
 
 		self::_configure();
 
-		if (!class_exists($HelperName)){
-
+		if (!class_exists(self::NSPACE . $HelperName)){
 			require_once self::$_helpers_dir . $HelperName . EXT;
 		}
 
-		$HelperName	= 'phelper\\'.$HelperName;
+		$HelperName	= self::NSPACE . $HelperName;
 
-		return new $HelperName($args);
+		// (new ReflectionClass($HelperName))->newInstanceArgs($args);
+
+		$Reflect = new ReflectionClass($HelperName);
+
+		$args	= func_get_args();
+		array_shift($args);
+
+		return $Reflect->newInstanceArgs($args);
 	}
 
 }
