@@ -27,28 +27,9 @@ class Controller_Front extends Controller_Base_Front {
 
 	public function action_lists()
 	{
-		$Category   = new Model_Category();
-//		$listRoots	= $Category->getRoots();
-//		$listLeafs	= $Category->getLeafs();
-//		$listBranches	= $Category->getBranches();
-
-//		var_dump($listLeafs->as_collection_of_objects());
-//		var_dump($listBranches->as_collection_of_objects());
-//		var_dump($listRoots->as_collection_of_objects());
-
-//		var_dump($Category->makeTree());
+		$this->View->render();
 
 
-
-		$mainMenuRenderSchema	= Phelper::Factory('SchemaTree', APPPATH . 'views/elements/menu/treeSchema.php' );
-
-		$SimpleTreeView	= Phelper::Factory('SimpleTree', $Category->makeTree(), $mainMenuRenderSchema);
-
-		$tree = $SimpleTreeView->renderToString();
-
-		var_dump($tree);
-
-//		$this->View->render();
 	}
 
 	public function action_menu(){

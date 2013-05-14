@@ -66,6 +66,13 @@ class ProphetView{
 		$this->layout   = $layout;
 	}
 
+	public function setLayoutData($aData){
+
+		foreach((array) $aData as $key => $value){
+			View::set_global($key, $value);
+		}
+	}
+
 	public function show($sViewFile, $aData){
 
 		$this->Response->body(View::factory($sViewFile, $aData));
