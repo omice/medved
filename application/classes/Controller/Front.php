@@ -32,6 +32,18 @@ class Controller_Front extends Controller_Base_Front {
 
 	}
 
+
+	public function action_getCategoryList($categoryId = null){
+
+		var_dump($categoryId);
+
+//		$Category   	= new Model_Category();
+//		$CategoryTag	= $Category->getChilds((int) $categoryId);
+//
+////		var_dump($CategoryTag);
+
+	}
+
 	public function action_menu(){
 
 		$this->View->showChild('elements/menu/vmenu');
