@@ -55,10 +55,9 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 	}
 
 
-	static public function getChilds($nodeId = NULL){
+	public function getChilds($nodeId = NULL){
 
-		$self	= self;
-		return $self->where($self->_parent_key, '=', $nodeId)->find_all();
+		return $this->where($this->_parent_key, '=', $nodeId)->find_all();
 	}
 
 	public function getRoots(){
