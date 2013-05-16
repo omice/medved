@@ -13,7 +13,7 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 	private		$_container	= array();
 
 
-	public function __construct(){
+	public function __construct($id = NULL){
 
 		parent::__construct();
 
@@ -28,6 +28,14 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
 			throw new Model_Abstract_Exeption_SimpleTree('"_exportMap" must be specified');
 		}
+
+		// если указан ИД в конструкторе то получаем модель с данными
+		if (!is_null($id)){
+
+			$this->{$this->_primary_key} =	$id;
+
+			$this->_container	= $this->where($this->_primary_key, '=', $id)->find_all();
+		}
 	}
 
 	public function getExportMap(){
@@ -41,10 +49,16 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 		return $this->_parent_key;
 	}
 
+	public function getPK(){
 
-	public function getChilds($nodeId = NULL){
+		return $this->{$this->_primary_key};
+	}
 
-		return $this->where($this->_parent_key, '=', $nodeId)->find_all();
+
+	static public function getChilds($nodeId = NULL){
+
+		$self	= self;
+		return $self->where($self->_parent_key, '=', $nodeId)->find_all();
 	}
 
 	public function getRoots(){

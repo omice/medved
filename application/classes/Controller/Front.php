@@ -33,14 +33,14 @@ class Controller_Front extends Controller_Base_Front {
 	}
 
 
-	public function action_getCategoryList($categoryId = null){
+	public function action_getCategoryList(){
 
-		var_dump($categoryId);
+		$categoryId	= $this->request->param('id');
 
-//		$Category   	= new Model_Category();
-//		$CategoryTag	= $Category->getChilds((int) $categoryId);
-//
-////		var_dump($CategoryTag);
+		$Category   	= new Model_Category();
+		$CategoryTag	= $Category->getChilds((int) $categoryId);
+
+		var_dump($CategoryTag);
 
 	}
 
