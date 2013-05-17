@@ -37,8 +37,8 @@ class Controller_Front extends Controller_Base_Front {
 
 		$categoryId	= $this->request->param('id');
 
-		$Category   	= new Model_Category();
-		$CategoryTag	= $Category->getChilds((int) $categoryId);
+		$Category   	= new Model_Category($categoryId);
+		$CategoryTag	= $Category->getChildTree();
 
 		var_dump($CategoryTag);
 

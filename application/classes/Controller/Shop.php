@@ -20,14 +20,16 @@ class Controller_Shop extends Controller_Base_Shop {
 
 		$categoryId	= $this->request->param('id');
 
-		$Category   	= new Model_Category();
-		$CategoryTag	= $Category->getChilds((int) $categoryId);
-		var_dump($CategoryTag);
+		$Category   	= new Model_Category($categoryId);
+
+//		var_dump($Category);
+//		$CategoryTag	= $Category->getChilds();
+//		var_dump($CategoryTag);
 
 
 
-
-		$this->View->render();
+die();
+//		$this->View->render();
 
 	}
 }

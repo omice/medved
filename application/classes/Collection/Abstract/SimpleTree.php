@@ -11,31 +11,34 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 	protected	$_parent_key;
 	protected	$_export_map; // карта экспорта полей, которые будут доступны при построении дерева (может быть задан в виде обычного или хэш массива)
 	private		$_container	= array();
-	private		$_node;
 
 
-	public function __construct($id = NULL){
+	public function __construct($id){
 
 		parent::__construct();
 
 		if(!$this->_parent_key){
 
-			Kohana::auto_load('Model_Exeption_SimpleTree');
-			throw new Model_Exeption_SimpleTree('"_parent_key" must be specified');
+			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
+			throw new Model_Abstract_Exeption_SimpleTree('"_parent_key" must be specified');
 		}
 
 		if(!$this->_export_map){
 
-			Kohana::auto_load('Model_Exeption_SimpleTree');
-			throw new Model_Exeption_SimpleTree('"_exportMap" must be specified');
+			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
+			throw new Model_Abstract_Exeption_SimpleTree('"_exportMap" must be specified');
 		}
 
-		if (!is_null($id)){
+		if (is_null($id)){
 
-			$this->_node				= $this->find_all()->as_collection_of_objects($this->_primary_key);
-			$this->_primary_key_value	= $id;
-			$this->makeTree();
+			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
+			throw new Model_Abstract_Exeption_SimpleTree('unknown model id');
+
 		}
+
+		$this->{$this->_primary_key} =	$id;
+		$this->_container	= $this->where($this->_primary_key, '=', $id)->find_all();
+
 	}
 
 	public function getExportMap(){
@@ -50,7 +53,7 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 
 	public function getPK(){
 
-		return $this->_primary_key_value;
+		return $this->{$this->_primary_key};
 	}
 
 	public function getPKAttrName(){
@@ -58,20 +61,49 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 		return $this->_primary_key;
 	}
 
-	public function getChildList(){
+	public function getChilds(){
 
-		return $this->where($this->_parent_key, '=', $this->_primary_key_value)->find_all();
+		return $this->where($this->_parent_key, '=', $this->getPK())->find_all();
 	}
 
-	public function getChildTree(){
+	public function getRoots(){
 
-		return $this->_node->nodes;
+		return $this->getChilds();
 	}
+
+	public function getLeafs(){
+
+		return DB::select('t1.*')->distinct(TRUE)
+			->from(array($this->_table_name, 't1'))
+			->join(array($this->_table_name, 't2'), 'LEFT')
+			->on('t2.'.($this->_parent_key), '=', 't1.'.($this->_primary_key) )
+			->where('t2.'.($this->_primary_key), 'IS', NULL)
+			->and_where('t1.'.($this->_parent_key), 'IS NOT', NULL)
+			->execute($this->_db_group);
+	}
+
+	public function getBranches(){
+
+		return DB::select('t2.*')->distinct(TRUE)
+			->from(array($this->_table_name, 't1'))
+			->join(array($this->_table_name, 't2'), 'LEFT')
+			->on('t2.'.($this->_primary_key), '=', 't1.'.($this->_parent_key) )
+			->where('t2.'.($this->_parent_key), 'IS NOT', NULL)
+			->execute($this->_db_group);
+	}
+
 
 	public function makeTree(&$node = NULL){
 
+		static $flatTree;
+
 		$PKName		= $this->_primary_key;
 		$PrKName	= $this->_parent_key;
+
+		if (!$flatTree){
+
+			$flatTree	= $this->find_all()->as_collection_of_objects($this->_primary_key);
+		}
 
 		if ($node){
 
@@ -80,7 +112,7 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 				$node->level	= 1;
 			}
 
-			foreach($this->_node as $childId => $child){
+			foreach($flatTree as $childId => $child){
 
 				if ($child->$PrKName == $node->$PKName){
 
@@ -99,28 +131,27 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 
 			if (!is_null($node->$PrKName)){
 
-				$this->_node[$node->$PrKName]->level	= $node->level -1;
+				$flatTree[$node->$PrKName]->level	= $node->level -1;
 			}
 
 		}else{
 
-			foreach($this->_node as &$node){
+			foreach($flatTree as &$node){
 
 				$this->makeTree($node);
 			}
 
 			// remove non-root elements from root
-			foreach($this->_node as &$node){
+			foreach($flatTree as &$node){
 
 				if ($node->$PrKName){
 
-					unset($this->_node[$node->$PKName]);
+					unset($flatTree[$node->$PKName]);
 				}
 			}
 		}
 
-		$this->_container	= $this->_node;
-//		$this->_container	= $this->_node[$this->_primary_key_value];
+		$this->_container	= $flatTree;
 		return $this;
 	}
 
