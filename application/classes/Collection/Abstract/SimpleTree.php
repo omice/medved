@@ -6,39 +6,25 @@
  * Time: 16:07
  */
 
-abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess, Iterator {
+class Collection_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess, Iterator {
 
 	protected	$_parent_key;
 	protected	$_export_map; // карта экспорта полей, которые будут доступны при построении дерева (может быть задан в виде обычного или хэш массива)
 	private		$_container	= array();
+	private		$_index_map	= array();
 
 
-	public function __construct($id){
-
-		parent::__construct();
+	public function __construct(){
 
 		if(!$this->_parent_key){
 
-			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
-			throw new Model_Abstract_Exeption_SimpleTree('"_parent_key" must be specified');
+			throw new Collection_Abstract_Exeption_SimpleTree('"_parent_key" must be specified');
 		}
 
 		if(!$this->_export_map){
 
-			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
-			throw new Model_Abstract_Exeption_SimpleTree('"_exportMap" must be specified');
+			throw new Collection_Abstract_Exeption_SimpleTree('"_exportMap" must be specified');
 		}
-
-		if (is_null($id)){
-
-			Kohana::auto_load('Model_Abstract_Exeption_SimpleTree');
-			throw new Model_Abstract_Exeption_SimpleTree('unknown model id');
-
-		}
-
-		$this->{$this->_primary_key} =	$id;
-		$this->_container	= $this->where($this->_primary_key, '=', $id)->find_all();
-
 	}
 
 	public function getExportMap(){
@@ -51,24 +37,14 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 		return $this->_parent_key;
 	}
 
-	public function getPK(){
-
-		return $this->{$this->_primary_key};
-	}
-
 	public function getPKAttrName(){
 
 		return $this->_primary_key;
 	}
 
-	public function getChilds(){
-
-		return $this->where($this->_parent_key, '=', $this->getPK())->find_all();
-	}
-
 	public function getRoots(){
 
-		return $this->getChilds();
+		return $this->where($this->_parent_key, 'IS', NULL)->find_all();
 	}
 
 	public function getLeafs(){
@@ -153,6 +129,11 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 
 		$this->_container	= $flatTree;
 		return $this;
+	}
+
+
+	public static function findNode($NodeId){
+
 	}
 
 

@@ -22,7 +22,7 @@ class Controller_Shop extends Controller_Base_Shop {
 
 		$Category   	= new Model_Category($categoryId);
 
-//		var_dump($Category);
+		var_dump($Category);
 //		$CategoryTag	= $Category->getChilds();
 //		var_dump($CategoryTag);
 
