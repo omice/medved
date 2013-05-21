@@ -4,14 +4,16 @@
  * User: user
  * Date: 18.04.13
  * Time: 16:07
+ * @see Prorhet
  */
 
-class Collection_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess, Iterator {
+class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 
+	protected 	$_table_name;
 	protected	$_parent_key;
 	protected	$_export_map; // карта экспорта полей, которые будут доступны при построении дерева (может быть задан в виде обычного или хэш массива)
+	protected 	$_DB;
 	private		$_container	= array();
-	private		$_index_map	= array();
 
 
 	public function __construct(){
@@ -25,7 +27,23 @@ class Collection_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAc
 
 			throw new Collection_Abstract_Exeption_SimpleTree('"_exportMap" must be specified');
 		}
+
+		$this->_DB			= Prophet::instance()->getFromPool($this->_table_name);
+
+		$treeListSQL	= $this->_DB->query(
+			Database::SELECT,
+			"SELECT * FROM {$this->_table_name}"
+		);
+
+		$modelList	= $treeListSQL->as_collection_of_objects($this->_primary_key);
+		while(list($modelId, ) = each($modelList)){
+
+			$this->_container[$modelId]	= new Model_Category($modelId);
+		}
+
+		$this->makeTree();
 	}
+
 
 	public function getExportMap(){
 
@@ -46,6 +64,19 @@ class Collection_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAc
 
 		return $this->where($this->_parent_key, 'IS', NULL)->find_all();
 	}
+
+	public function getNodeChildsById($id){
+
+		$node = $this->findNodeById($id);
+
+		if ($node){
+
+			return $node->childNodes;
+		}
+
+		return false;
+	}
+
 
 	public function getLeafs(){
 
@@ -69,16 +100,14 @@ class Collection_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAc
 	}
 
 
-	public function makeTree(&$node = NULL){
-
-		static $flatTree;
+	public function makeTree($node = NULL){
 
 		$PKName		= $this->_primary_key;
 		$PrKName	= $this->_parent_key;
 
-		if (!$flatTree){
+		if (empty($this->_container)){
 
-			$flatTree	= $this->find_all()->as_collection_of_objects($this->_primary_key);
+			// do something...
 		}
 
 		if ($node){
@@ -88,7 +117,7 @@ class Collection_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAc
 				$node->level	= 1;
 			}
 
-			foreach($flatTree as $childId => $child){
+			foreach($this->_container as $childId => $child){
 
 				if ($child->$PrKName == $node->$PKName){
 
@@ -101,39 +130,63 @@ class Collection_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAc
 						$node->level	= $child->level - 1;
 					}
 
-					$node->nodes[$childId]	= $child;
+					$node->childNodes[$childId]	= $child;
+
 				}
 			}
 
 			if (!is_null($node->$PrKName)){
 
-				$flatTree[$node->$PrKName]->level	= $node->level -1;
+				$this->_container[$node->$PrKName]->level	= $node->level -1;
 			}
 
 		}else{
 
-			foreach($flatTree as &$node){
+			foreach($this->_container as $node){
 
 				$this->makeTree($node);
 			}
 
 			// remove non-root elements from root
-			foreach($flatTree as &$node){
+			foreach($this->_container as $node){
 
 				if ($node->$PrKName){
 
-					unset($flatTree[$node->$PKName]);
+					unset($this->_container[$node->$PKName]);
 				}
 			}
 		}
 
-		$this->_container	= $flatTree;
 		return $this;
 	}
 
 
-	public static function findNode($NodeId){
+	public function findNodeById($id, $nodes = NULL){
 
+		if (is_null($nodes)){
+
+			$nodes = $this->_container;
+		}
+
+		if (!empty($nodes)){
+
+			foreach($nodes as $nodeID => $node){
+
+				if ($nodeID == $id){
+
+					return $node;
+
+				}elseif(isset($node->childNodes)){
+
+					$result	= $this->findNodeById($id, $node->childNodes);
+					if ($result){
+						return $result;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 

@@ -21,8 +21,4 @@ class Model_Category extends Model_Abstract_SimpleTree {
 		'category_desc',
 	);
 
-	public function getList(){
-
-		return $this->find_all();
-	}
 }

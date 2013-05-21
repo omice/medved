@@ -11,8 +11,6 @@ class Controller_Shop extends Controller_Base_Shop {
 	public function action_list()
 	{
 		$this->View->render();
-
-
 	}
 
 
@@ -21,12 +19,14 @@ class Controller_Shop extends Controller_Base_Shop {
 		$categoryId	= $this->request->param('id');
 
 		$Category   	= new Model_Category($categoryId);
-
-		var_dump($Category);
-//		$CategoryTag	= $Category->getChilds();
+//
+//		$CategoryTag	= $Category->getChildList();
 //		var_dump($CategoryTag);
 
-
+		$col	= new Collection_Category();
+		//var_dump($col);
+//		var_dump($col->findNodeById($categoryId)->level);
+		var_dump($col->getNodeChildsById($Category->getPKValue()));
 
 die();
 //		$this->View->render();

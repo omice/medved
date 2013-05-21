@@ -8,11 +8,13 @@
 
 abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess {
 
+	public		$level;
+	public		$childNodes	= array();
 	protected	$_parent_key;
 	private		$_container	= array();
 
 
-	public function __construct($id = NULL){
+	public function __construct($id){
 
 		parent::__construct();
 
@@ -22,11 +24,10 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 			throw new Model_Exeption_SimpleTree('"_parent_key" must be specified');
 		}
 
-		if (!is_null($id)){
+		array_push($this->_export_map, 'level');
 
-			$this->_container			= $this->where($this->_primary_key, '=', $this->_primary_key_value)->find_all();
-			$this->_primary_key_value	= $id;
-		}
+		$this->_primary_key_value	= $id;
+		$this->_container			= $this->where($this->_primary_key, '=', $this->_primary_key_value)->find()->as_array();
 	}
 
 	public function getParentAttrName(){
@@ -46,12 +47,22 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 
 	public function getChildList(){
 
-		return $this->where($this->_parent_key, '=', $this->_primary_key_value)->find_all();
+		return ;
 	}
 
 	public function getChildNode(){
 
 		return $this->_container->nodes;
+	}
+
+	public function getParent(){
+
+		return ;
+	}
+
+	public function getParentNode(){
+
+		return ;
 	}
 
 
