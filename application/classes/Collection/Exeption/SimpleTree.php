@@ -7,4 +7,4 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class Model_Abstract_Exeption_SimpleTree extends Exception{}
+class Collection_Exeption_SimpleTree extends Exception{}

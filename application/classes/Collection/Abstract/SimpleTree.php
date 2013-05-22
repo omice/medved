@@ -1,32 +1,42 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: user
- * Date: 18.04.13
- * Time: 16:07
- * @see Prorhet
+ * @abstract Must be inherited for creating instance
+ *
+ * @TODO сделать индексированый поиск узлов
  */
 
 class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 
 	protected 	$_table_name;
+	protected	$_primary_key;
 	protected	$_parent_key;
 	protected	$_export_map; // карта экспорта полей, которые будут доступны при построении дерева (может быть задан в виде обычного или хэш массива)
-	protected 	$_DB;
+	private 	$_DB;
 	private		$_container	= array();
+	private		$_child_map	= array();
 
 
-	public function __construct(){
+	/**
+	 * @param $modelName
+	 * @throws Collection_Exeption_SimpleTree
+	 */
+	protected function __construct($modelName){
 
-		if(!$this->_parent_key){
+		$modInfo			= new ReflectionClass($modelName);
 
-			throw new Collection_Abstract_Exeption_SimpleTree('"_parent_key" must be specified');
+		if (!class_exists('Model_Abstract_SimpleTree') || !$modInfo->isSubclassOf('Model_Abstract_SimpleTree')){
+
+			Kohana::auto_load('Collection_Exeption_SimpleTree');
+			throw new Collection_Exeption_SimpleTree('Model interface not supported (must be instance of "Model_Abstract_SimpleTree" class)');
 		}
 
-		if(!$this->_export_map){
+		$modProps			= $modInfo->getDefaultProperties();
+		$this->_table_name	= $modProps['_table_name'];
+		$this->_primary_key	= $modProps['_primary_key'];
+		$this->_parent_key	= $modProps['_parent_key'];
+		$this->_export_map	= $modProps['_export_map'];
 
-			throw new Collection_Abstract_Exeption_SimpleTree('"_exportMap" must be specified');
-		}
+
 
 		$this->_DB			= Prophet::instance()->getFromPool($this->_table_name);
 
@@ -36,6 +46,7 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 		);
 
 		$modelList	= $treeListSQL->as_collection_of_objects($this->_primary_key);
+
 		while(list($modelId, ) = each($modelList)){
 
 			$this->_container[$modelId]	= new Model_Category($modelId);
@@ -45,24 +56,35 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 	}
 
 
-	public function getExportMap(){
+	public function __call($methodName, $arguments){
+
+		$methodNewName	= 'col_'.$methodName;
+		if (method_exists(__CLASS__, $methodNewName)){
+
+			return call_user_func_array(array($this, $methodNewName) , $arguments);
+
+		}
+	}
+
+
+	public function col_getExportMap(){
 
 		return $this->_export_map;
 	}
 
-	public function getParentAttrName(){
+	public function getParentKeyName(){
 
 		return $this->_parent_key;
 	}
 
-	public function getPKAttrName(){
+	public function getPKName(){
 
 		return $this->_primary_key;
 	}
 
-	public function getRoots(){
+	public function getTableName(){
 
-		return $this->where($this->_parent_key, 'IS', NULL)->find_all();
+		return $this->_table_name;
 	}
 
 	public function getNodeChildsById($id){
@@ -78,29 +100,7 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 	}
 
 
-	public function getLeafs(){
-
-		return DB::select('t1.*')->distinct(TRUE)
-			->from(array($this->_table_name, 't1'))
-			->join(array($this->_table_name, 't2'), 'LEFT')
-			->on('t2.'.($this->_parent_key), '=', 't1.'.($this->_primary_key) )
-			->where('t2.'.($this->_primary_key), 'IS', NULL)
-			->and_where('t1.'.($this->_parent_key), 'IS NOT', NULL)
-			->execute($this->_db_group);
-	}
-
-	public function getBranches(){
-
-		return DB::select('t2.*')->distinct(TRUE)
-			->from(array($this->_table_name, 't1'))
-			->join(array($this->_table_name, 't2'), 'LEFT')
-			->on('t2.'.($this->_primary_key), '=', 't1.'.($this->_parent_key) )
-			->where('t2.'.($this->_parent_key), 'IS NOT', NULL)
-			->execute($this->_db_group);
-	}
-
-
-	public function makeTree($node = NULL){
+	private function makeTree($node = NULL){
 
 		$PKName		= $this->_primary_key;
 		$PrKName	= $this->_parent_key;
@@ -117,6 +117,8 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 				$node->level	= 1;
 			}
 
+			$this->_child_map[$node->$PKName]	= array();
+
 			foreach($this->_container as $childId => $child){
 
 				if ($child->$PrKName == $node->$PKName){
@@ -132,6 +134,7 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 
 					$node->childNodes[$childId]	= $child;
 
+					array_push($this->_child_map[$node->$PKName], $childId);
 				}
 			}
 
