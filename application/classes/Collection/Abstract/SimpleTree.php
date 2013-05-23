@@ -1,19 +1,20 @@
 <?php
 /**
- * @abstract Must be inherited for creating instance
+ * @abstract
+ * для статического экспорта методы должны иметь префикс
  *
  * @TODO сделать индексированый поиск узлов
+ * @TODO переделать интерфейс ArrayAccess
  */
 
-class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
+abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, Interface_Abstract_Collection {
 
 	protected 	$_table_name;
 	protected	$_primary_key;
 	protected	$_parent_key;
 	protected	$_export_map; // карта экспорта полей, которые будут доступны при построении дерева (может быть задан в виде обычного или хэш массива)
-	private 	$_DB;
-	private		$_container	= array();
-	private		$_child_map	= array();
+	protected	$_export_prefix	= '_static_'; // префикс для методов для которых разрешен статический экспорт
+	private		$_container		= array();
 
 
 	/**
@@ -30,22 +31,20 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 			throw new Collection_Exeption_SimpleTree('Model interface not supported (must be instance of "Model_Abstract_SimpleTree" class)');
 		}
 
-		$modProps			= $modInfo->getDefaultProperties();
-		$this->_table_name	= $modProps['_table_name'];
-		$this->_primary_key	= $modProps['_primary_key'];
-		$this->_parent_key	= $modProps['_parent_key'];
-		$this->_export_map	= $modProps['_export_map'];
+		$modProps				= $modInfo->getDefaultProperties();
+		$this->_table_name		= $modProps['_table_name'];
+		$this->_primary_key		= $modProps['_primary_key'];
+		$this->_parent_key		= $modProps['_parent_key'];
+		$this->_export_map		= $modProps['_export_map'];
+		$this->_export_prefix	= __CLASS__.'_';
 
 
-
-		$this->_DB			= Prophet::instance()->getFromPool($this->_table_name);
-
-		$treeListSQL	= $this->_DB->query(
-			Database::SELECT,
-			"SELECT * FROM {$this->_table_name}"
-		);
-
-		$modelList	= $treeListSQL->as_collection_of_objects($this->_primary_key);
+		$modelList	= Prophet::instance()
+			->getFromPool($this->_table_name)
+			->query(
+				Database::SELECT,
+				"SELECT * FROM {$this->_table_name}"
+		)->as_collection_of_objects($this->_primary_key);
 
 		while(list($modelId, ) = each($modelList)){
 
@@ -58,42 +57,82 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 
 	public function __call($methodName, $arguments){
 
-		$methodNewName	= 'col_'.$methodName;
-		if (method_exists(__CLASS__, $methodNewName)){
+		$methodName	= $this->_export_prefix . $methodName;
+		if (method_exists(__CLASS__, $methodName)){
 
-			return call_user_func_array(array($this, $methodNewName) , $arguments);
+			return call_user_func_array(array($this, $methodName) , $arguments);
 
 		}
 	}
 
 
-	public function col_getExportMap(){
+	#
+	#	EXPORT
+	#
+	protected function Collection_Abstract_SimpleTree_getExportMap(){
 
 		return $this->_export_map;
 	}
 
-	public function getParentKeyName(){
+	protected function Collection_Abstract_SimpleTree_getParentKeyName(){
 
 		return $this->_parent_key;
 	}
 
-	public function getPKName(){
+	protected function Collection_Abstract_SimpleTree_getPKName(){
 
 		return $this->_primary_key;
 	}
 
-	public function getTableName(){
+	protected function Collection_Abstract_SimpleTree_getTableName(){
 
 		return $this->_table_name;
 	}
 
-	public function getNodeChildsById($id){
+	protected function Collection_Abstract_SimpleTree_getChildNodesById($id){
 
-		$node = $this->findNodeById($id);
+		$node = $this->_findNodeById($id);
 
 		if ($node){
 
 			return $node->childNodes;
+		}
+
+		return false;
+	}
+
+	protected function Collection_Abstract_SimpleTree_findNodeById($id){
+
+		$this->_findNodeById($id);
+	}
+	#
+	#	end of EXPORT
+	#
+
+
+	private function _findNodeById($id, $nodes = NULL){
+
+		if (is_null($nodes)){
+
+			$nodes = $this->_container;
+		}
+
+		if (!empty($nodes)){
+
+			foreach($nodes as $nodeID => $node){
+
+				if ($nodeID == $id){
+
+					return $node;
+
+				}elseif(isset($node->childNodes)){
+
+					$result	= $this->_findNodeById($id, $node->childNodes);
+					if ($result){
+						return $result;
+					}
+				}
+			}
 		}
 
 		return false;
@@ -117,8 +156,6 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 				$node->level	= 1;
 			}
 
-			$this->_child_map[$node->$PKName]	= array();
-
 			foreach($this->_container as $childId => $child){
 
 				if ($child->$PrKName == $node->$PKName){
@@ -133,8 +170,6 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 					}
 
 					$node->childNodes[$childId]	= $child;
-
-					array_push($this->_child_map[$node->$PKName], $childId);
 				}
 			}
 
@@ -164,37 +199,16 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 	}
 
 
-	public function findNodeById($id, $nodes = NULL){
+	/**
+	 * Interface_Abstract_Collection implement
+	 */
+	public function getExportPrefix(){
 
-		if (is_null($nodes)){
-
-			$nodes = $this->_container;
-		}
-
-		if (!empty($nodes)){
-
-			foreach($nodes as $nodeID => $node){
-
-				if ($nodeID == $id){
-
-					return $node;
-
-				}elseif(isset($node->childNodes)){
-
-					$result	= $this->findNodeById($id, $node->childNodes);
-					if ($result){
-						return $result;
-					}
-				}
-			}
-		}
-
-		return false;
+		return $this->_export_prefix;
 	}
 
-
 	/**
-	 * ArrayAccess impliment
+	 * ArrayAccess implement
 	 */
 	public function offsetSet($offset, $value) {
 
@@ -220,29 +234,29 @@ class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator {
 
 
 	/**
-	 * Iterator impliment
+	 * Iterator implement
 	 */
-	function rewind() {
+	public function rewind() {
 
 		reset($this->_container);
 	}
 
-	function current() {
+	public function current() {
 
 		return current($this->_container);
 	}
 
-	function key() {
+	public function key() {
 
 		return key($this->_container);
 	}
 
-	function next() {
+	public function next() {
 
 		next($this->_container);
 	}
 
-	function valid() {
+	public function valid() {
 
 		return (bool) current($this->_container);
 	}

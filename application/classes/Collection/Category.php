@@ -1,6 +1,10 @@
 <?php
-
-class Collection_Category extends Collection_Abstract_SimpleTree {
+/**
+ * Class Collection_Category
+ * @property getExportMap
+ *
+ */
+class Collection_Category extends Collection_Abstract_SimpleTree implements Interface_StaticCollection {
 
 	private static		$_instance		= false;
 	protected static	$_model_name	= 'Model_Category';
@@ -21,6 +25,21 @@ class Collection_Category extends Collection_Abstract_SimpleTree {
 		}
 	}
 
+	public static function staticExport($methodName){
+
+		$instance			= self::getInstance();
+		$parentClassName	= get_parent_class($instance);
+		$methodName			= $instance->getExportPrefix() . $methodName;
+
+		if (!method_exists($parentClassName, $methodName)){
+
+			Kohana::auto_load('Collection_Exeption_Category');
+			throw new Collection_Exeption_Category('Method not exist or not support static export');
+		}
+
+		return $instance->$methodName();
+	}
+
 
 	public static function getInstance(){
 
@@ -29,86 +48,65 @@ class Collection_Category extends Collection_Abstract_SimpleTree {
 		return self::$_instance;
 	}
 
+	public static function getModelName(){
 
-	public static function __callStatic($methodName, $arguments){
-
-		self::__init();
-
-		$methodNewName	= 'pub_'.$methodName;
-		if (method_exists(__CLASS__, $methodNewName)){
-
-			var_dump(__CLASS__ . '::' .$methodNewName);
-			return call_user_func_array(__CLASS__ . '::' .$methodNewName  , $arguments);
-
-		}
+		return self::$_model_name;
 	}
 
 
+	public static function getExportMap(){
 
-	protected static function pub_getExportMap(){
-
-		return self::$_instance->getExportMap();
+		return self::staticExport(__FUNCTION__);
 	}
 
-	protected static function pub_getParentKeyName(){
+	public static function getParentKeyName(){
 
-		return self::$_instance->getParentKeyName();
+		return self::staticExport(__FUNCTION__);
 	}
 
-	protected static function pub_getPKName(){
+	public static function getPKName(){
 
-		return self::$_instance->getPKName();
+		return self::staticExport(__FUNCTION__);
 	}
 
-	protected static function pub_getNodeChildsById($id){
+	public static function getTableName(){
 
-		return self::$_instance->getNodeChildsById($id);
+		return self::staticExport(__FUNCTION__);
 	}
-
-	protected static function pub_findNodeById($id){
-
-		return self::$_instance->findNodeById($id);
-	}
-
 
 	public static function getLeafs(){
 
-		self::__init();
+		$instance	= self::getInstance();
 
 		return DB::select('t1.*')->distinct(TRUE)
-			->from(array(self::$_instance->_table_name, 't1'))
-			->join(array(self::$_instance->_table_name, 't2'), 'LEFT')
-			->on('t2.'.(self::$_instance->_parent_key), '=', 't1.'.(self::$_instance->_primary_key) )
-			->where('t2.'.(self::$_instance->_primary_key), 'IS', NULL)
-			->and_where('t1.'.(self::$_instance->_parent_key), 'IS NOT', NULL)
+			->from(array($instance->_table_name, 't1'))
+			->join(array($instance->_table_name, 't2'), 'LEFT')
+			->on('t2.'.($instance->_parent_key), '=', 't1.'.($instance->_primary_key) )
+			->where('t2.'.($instance->_primary_key), 'IS', NULL)
+			->and_where('t1.'.($instance->_parent_key), 'IS NOT', NULL)
 			->execute(
 				Prophet::instance()
 					->getConfigByTableName(
-						self::$_instance->_table_name
+						$instance->_table_name
 					)
 			);
 	}
 
 	public static function getBranches(){
 
-		self::__init();
+		$instance	= self::getInstance();
 
 		return DB::select('t2.*')->distinct(TRUE)
-			->from(array(self::$_instance->_table_name, 't1'))
-			->join(array(self::$_instance->_table_name, 't2'), 'LEFT')
-			->on('t2.'.(self::$_instance->_primary_key), '=', 't1.'.(self::$_instance->_parent_key) )
-			->where('t2.'.(self::$_instance->_parent_key), 'IS NOT', NULL)
+			->from(array($instance->_table_name, 't1'))
+			->join(array($instance->_table_name, 't2'), 'LEFT')
+			->on('t2.'.($instance->_primary_key), '=', 't1.'.($instance->_parent_key) )
+			->where('t2.'.($instance->_parent_key), 'IS NOT', NULL)
 			->execute(
 				Prophet::instance()
 					->getConfigByTableName(
-						self::$_instance->_table_name
+						$instance->_table_name
 					)
 			);
 	}
 
-
-	public static function getModelName(){
-
-		return self::$_model_name;
-	}
 }

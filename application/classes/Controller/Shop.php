@@ -29,6 +29,9 @@ class Controller_Shop extends Controller_Base_Shop {
 //var_dump(Collection_Category::getInstance());
 //		var_dump(Collection_Category::getInstance()->findNodeById($categoryId));
 
+
+//		var_dump($cat::getExportMap());
+
 		var_dump(Collection_Category::getExportMap());
 
 
