@@ -15,10 +15,12 @@ class SimpleTree {
 	private $_tree;
 	private $_rootIndex;
 
-	public function __construct(\Model_Abstract_SimpleTree $treeObject, SchemaTree $treeSchema){
+	public function __construct(\Collection_Abstract_SimpleTree $treeObject, SchemaTree $treeSchema){
 
 		$this->_tree	= $treeObject;
 		$this->_schema	= $treeSchema;
+
+		$this->makeTree($this->_tree);
 
 	}
 
@@ -38,6 +40,8 @@ class SimpleTree {
 		static $treeStr;
 		static $parentIdAttrName;
 
+		var_dump($treeObject);
+
 		$parentIdAttrName	= !$parentIdAttrName ? $treeObject->getParentAttrName() : $parentIdAttrName;
 
 		foreach($treeObject as $node){
@@ -49,9 +53,9 @@ class SimpleTree {
 
 			$treeStr	.= $this->renderNodeBegin($node);
 
-			if (isset($node->nodes)){
+			if (isset($node->childNodes)){
 
-				$this->makeTree($node->nodes);
+				$this->makeTree($node->childNodes);
 			}
 
 			$treeStr	.= $this->renderNodeEnd($node);
@@ -80,13 +84,11 @@ class SimpleTree {
 
 		$template	= $this->_schema->getByIndex($nodeIndex, $part);
 
-
 		foreach($this->_tree->getExportMap() as $newVar => $newVal){
 
 			if (is_int($newVar)){// если список не ассоциативные то экспортируем переменные под текущими именами
 				$newVar = $newVal;
 			}
-
 			$$newVar	= $node->$newVal;
 		}
 
