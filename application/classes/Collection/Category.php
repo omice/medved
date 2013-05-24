@@ -25,7 +25,7 @@ class Collection_Category extends Collection_Abstract_SimpleTree implements Inte
 		}
 	}
 
-	public static function staticExport($methodName){
+	public static function staticExport($methodName, $arguments = NULL){
 
 		$instance			= self::getInstance();
 		$parentClassName	= get_parent_class($instance);
@@ -37,7 +37,7 @@ class Collection_Category extends Collection_Abstract_SimpleTree implements Inte
 			throw new Collection_Exeption_Category('Method not exist or not support static export');
 		}
 
-		return $instance->$methodName();
+		return call_user_func_array(array($instance, $methodName) , (array) $arguments);
 	}
 
 
@@ -72,6 +72,11 @@ class Collection_Category extends Collection_Abstract_SimpleTree implements Inte
 	public static function getTableName(){
 
 		return self::staticExport(__FUNCTION__);
+	}
+
+	public static function findNodeById($id){
+
+		return self::staticExport(__FUNCTION__, $id);
 	}
 
 	public static function getLeafs(){

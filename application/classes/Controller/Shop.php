@@ -16,30 +16,8 @@ class Controller_Shop extends Controller_Base_Shop {
 
 	public function action_getCategoryList(){
 
-		$categoryId	= $this->request->param('id');
+		$this->View->render();
 
-//		$Category   	= new Model_Category($categoryId);
-//
-//		$CategoryTag	= $Category->getChildList();
-//		var_dump($CategoryTag);
-
-//		$col	= Collection_Category::findNodeById($categoryId);
-
-//var_dump(new Collection_Category);
-//var_dump(Collection_Category::getInstance());
-//		var_dump(Collection_Category::getInstance()->findNodeById($categoryId));
-
-
-//		var_dump($cat::getExportMap());
-
-		var_dump(Collection_Category::getExportMap());
-
-
-//		var_dump($col->findNodeById($categoryId)->level);
-		//var_dump($col->getNodeChildsById($Category->getPKValue()));
-
-die();
-//		$this->View->render();
 
 	}
 }

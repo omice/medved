@@ -25,7 +25,7 @@ abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, 
 
 		$modInfo			= new ReflectionClass($modelName);
 
-		if (!class_exists('Model_Abstract_SimpleTree') || !$modInfo->isSubclassOf('Model_Abstract_SimpleTree')){
+		if (!interface_exists('Interface_TreeModel') || !$modInfo->implementsInterface('Interface_TreeModel')){
 
 			Kohana::auto_load('Collection_Exeption_SimpleTree');
 			throw new Collection_Exeption_SimpleTree('Model interface not supported (must be instance of "Model_Abstract_SimpleTree" class)');
@@ -103,7 +103,7 @@ abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, 
 
 	protected function Collection_Abstract_SimpleTree_findNodeById($id){
 
-		$this->_findNodeById($id);
+		return $this->_findNodeById($id);
 	}
 	#
 	#	end of EXPORT

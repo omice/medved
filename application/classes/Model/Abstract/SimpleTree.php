@@ -6,13 +6,13 @@
  * Time: 16:07
  */
 
-abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess {
+abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements ArrayAccess, Interface_TreeModel{
 
 	public		$level;
 	public		$childNodes	= array();
 	protected	$_parent_key;
+	protected	$_export_map;
 	private		$_container	= array();
-
 
 	public function __construct($id){
 
@@ -24,25 +24,31 @@ abstract class Model_Abstract_SimpleTree extends ProphetORM_Model implements Arr
 			throw new Model_Exeption_SimpleTree('"_parent_key" must be specified');
 		}
 
+		if(!$this->_export_map){
+
+			Kohana::auto_load('Model_Exeption_SimpleTree');
+			throw new Model_Exeption_SimpleTree('"_export_map" must be list of exported fields');
+		}
+
 		array_push($this->_export_map, 'level');
 
 		$this->_primary_key_value	= $id;
 		$this->_container			= $this->where($this->_primary_key, '=', $this->_primary_key_value)->find()->as_array();
 	}
 
-	public function getParentAttrName(){
+	public function getParentName(){
 
 		return $this->_parent_key;
+	}
+
+	public function getPKName(){
+
+		return $this->_primary_key;
 	}
 
 	public function getPKValue(){
 
 		return $this->_primary_key_value;
-	}
-
-	public function getPKAttrName(){
-
-		return $this->_primary_key;
 	}
 
 	public function getChildList(){

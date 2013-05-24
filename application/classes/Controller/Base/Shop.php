@@ -6,13 +6,13 @@ class Controller_Base_Shop extends Controller_Base {
 
 		parent::__construct($request, $response);
 
-//		$Category   = new Model_Category();
-//
-//		$mainMenuRenderSchema	= Phelper::Factory('SchemaTree', APPPATH . 'views/elements/menu/treeSchema.php' );
-//
-//		$SimpleTreeView	= Phelper::Factory('SimpleTree', $Category->makeTree(), $mainMenuRenderSchema);
-//
-//		$this->View->setLayout('list');
+		$mainMenuRenderSchema	= Phelper::Factory('SchemaTree', APPPATH . 'views/elements/menu/treeSchema.php' );
+
+		$SimpleTreeView	= Phelper::Factory('SimpleTree', Collection_Category::getInstance(), $mainMenuRenderSchema);
+
+		$this->View->setLayout('list');
+
+//		var_dump($SimpleTreeView->renderToString());
 //
 //		$this->View->setLayoutData(array(
 //			'category_menu' => $SimpleTreeView->renderToString(),
