@@ -15,7 +15,7 @@ class SimpleTree {
 	private $_tree;
 	private $_rootIndex;
 
-	public function __construct(\Collection_Abstract_SimpleTree $treeObject, SchemaTree $treeSchema){
+	public function __construct(\Interface_TreeCollection $treeObject, SchemaTree $treeSchema){
 
 		$this->_tree	= $treeObject;
 		$this->_schema	= $treeSchema;

@@ -2,14 +2,8 @@
 
 interface Interface_StaticCollection {
 
-	public static function getModelName();
+	public function getExportPrefix();
 
-	public static function getExportMap();
-
-	public static function getParentKeyName();
-
-	public static function getPKName();
-
-	public static function getTableName();
+	public static function staticExport($methodName, $arguments = NULL);
 
 }

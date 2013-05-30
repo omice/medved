@@ -7,13 +7,13 @@
  * @TODO переделать интерфейс ArrayAccess
  */
 
-abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, Interface_Abstract_Collection {
+abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, Interface_TreeCollection {
 
 	protected 	$_table_name;
 	protected	$_primary_key;
 	protected	$_parent_key;
+	protected 	$_model_name;
 	protected	$_export_map; // карта экспорта полей, которые будут доступны при построении дерева (может быть задан в виде обычного или хэш массива)
-	protected	$_export_prefix	= '_static_'; // префикс для методов для которых разрешен статический экспорт
 	private		$_container		= array();
 
 
@@ -36,7 +36,7 @@ abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, 
 		$this->_primary_key		= $modProps['_primary_key'];
 		$this->_parent_key		= $modProps['_parent_key'];
 		$this->_export_map		= $modProps['_export_map'];
-		$this->_export_prefix	= __CLASS__.'_';
+		$this->_model_name		= $modelName;
 
 
 		$modelList	= Prophet::instance()
@@ -55,41 +55,32 @@ abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, 
 	}
 
 
-	public function __call($methodName, $arguments){
-
-		$methodName	= $this->_export_prefix . $methodName;
-		if (method_exists(__CLASS__, $methodName)){
-
-			return call_user_func_array(array($this, $methodName) , $arguments);
-
-		}
-	}
-
-
-	#
-	#	EXPORT
-	#
-	protected function Collection_Abstract_SimpleTree_getExportMap(){
+	public function getExportMap(){
 
 		return $this->_export_map;
 	}
 
-	protected function Collection_Abstract_SimpleTree_getParentKeyName(){
+	public function getParentKeyName(){
 
 		return $this->_parent_key;
 	}
 
-	protected function Collection_Abstract_SimpleTree_getPKName(){
+	public function getPKName(){
 
 		return $this->_primary_key;
 	}
 
-	protected function Collection_Abstract_SimpleTree_getTableName(){
+	public function getTableName(){
 
 		return $this->_table_name;
 	}
 
-	protected function Collection_Abstract_SimpleTree_getChildNodesById($id){
+	public function getModelName(){
+
+		return $this->_model_name;
+	}
+
+	public function getChildNodesById($id){
 
 		$node = $this->_findNodeById($id);
 
@@ -101,13 +92,10 @@ abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, 
 		return false;
 	}
 
-	protected function Collection_Abstract_SimpleTree_findNodeById($id){
+	public function getNodeById($id){
 
 		return $this->_findNodeById($id);
 	}
-	#
-	#	end of EXPORT
-	#
 
 
 	private function _findNodeById($id, $nodes = NULL){
@@ -198,14 +186,6 @@ abstract class Collection_Abstract_SimpleTree implements ArrayAccess, Iterator, 
 		return $this;
 	}
 
-
-	/**
-	 * Interface_Abstract_Collection implement
-	 */
-	public function getExportPrefix(){
-
-		return $this->_export_prefix;
-	}
 
 	/**
 	 * ArrayAccess implement

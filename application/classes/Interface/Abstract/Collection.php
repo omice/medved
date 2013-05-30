@@ -2,8 +2,10 @@
 
 interface Interface_Abstract_Collection {
 
-	public function getExportPrefix();
+	public function getModelName();
 
-	public static function staticExport($methodName, $arguments = NULL);
+	public function getPKName();
+
+	public function getTableName();
 
 }
